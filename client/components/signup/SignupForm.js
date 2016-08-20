@@ -3,6 +3,9 @@ import timezones from '../../data/timezones'
 import map from 'lodash/map'
 import classnames from 'classnames'
 
+import validateInput from '../../../server/shared/validations/signup'
+import TextFieldGrop from '../common/TextFieldGroup'
+
 class SignupForm extends React.Component {
   constructor(props) {
     super(props)
@@ -25,13 +28,24 @@ class SignupForm extends React.Component {
     })
   }
 
+  isValid() {
+    const { errors, isValid } = validateInput(this.state);
+
+    if (!isValid) {
+      this.setState({ errors })
+    }
+    return isValid
+  }
+
   onSubmit(e) {
     e.preventDefault()
-    this.setState({errors: {}, isLoading: true})
-    this.props.userSignupRequest(this.state).then(
-      () => {},
-      ({data}) => this.setState({errors: data, isLoading: false})
-    )
+    if (this.isValid()) {
+      this.setState({errors: {}, isLoading: true})
+      this.props.userSignupRequest(this.state).then(
+        () => {},
+        ({data}) => this.setState({errors: data, isLoading: false})
+      )
+    }
   }
 
   render() {
@@ -42,53 +56,39 @@ class SignupForm extends React.Component {
     return (
       <form onSubmit={this.onSubmit}>
         <h1>Join us</h1>
-        <div className={classnames("form-group", {'has-error': errors.username})}>
-          <label className="control-label">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={this.state.username}
-            onChange={this.onChange}
-            className="form-control"
-          />
-          {errors.username && <span className="help-block">{errors.username}</span>}
-        </div>
+        <TextFieldGrop
+          error={errors.username}
+          label="UserName"
+          onChange={this.onChange}
+          value={this.state.username}
+          field="username"
+        />
 
-        <div className={classnames("form-group", {'has-error': errors.email})}>
-          <label className="control-label">Email</label>
-          <input
-            type="text"
-            name="email"
-            value={this.state.email}
-            onChange={this.onChange}
-            className="form-control"
-          />
-          {errors.email && <span className="help-block">{errors.email}</span>}
-        </div>
+        <TextFieldGrop
+          error={errors.email}
+          label="Email"
+          onChange={this.onChange}
+          value={this.state.email}
+          field="email"
+        />
 
-        <div className={classnames("form-group", {'has-error': errors.password})}>
-          <label className="control-label">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={this.state.password}
-            onChange={this.onChange}
-            className="form-control"
-          />
-          {errors.password && <span className="help-block">{errors.password}</span>}
-        </div>
+        <TextFieldGrop
+          error={errors.password}
+          label="Password"
+          onChange={this.onChange}
+          value={this.state.password}
+          field="password"
+          type="password"
+        />
 
-        <div className={classnames("form-group", {'has-error': errors.passwordConfirmation})}>
-          <label className="control-label">Password Confirmation</label>
-          <input
-            type="password"
-            name="passwordConfirmation"
-            value={this.state.passwordConfirmation}
-            onChange={this.onChange}
-            className="form-control"
-          />
-          {errors.passwordConfirmation && <span className="help-block">{errors.passwordConfirmation}</span>}
-        </div>
+        <TextFieldGrop
+          error={errors.passwordConfirmation}
+          label="Password Confirmation"
+          onChange={this.onChange}
+          value={this.state.passwordConfirmation}
+          field="passwordConfirmation"
+          type="password"
+        />
 
         <div className={classnames("form-group", {'has-error': errors.timezone})}>
           <div className="control-label">Timezone</div>
